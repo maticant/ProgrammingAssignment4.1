@@ -1,18 +1,29 @@
 # Plot 3
 library("data.table")
+library(lubridate)
+library("dplyr")
 getwd()
-setwd("C:/Users/mccan/Documents/R/Repositorios/ProgrammingAssignment4.2")
-powerDT <- data.table::fread(input = "household_power_consumption.txt"
-                             , na.strings="?"
-)
-powerDT[, Global_active_power := lapply(.SD, as.numeric), .SDcols = c("Global_active_power")]
-powerDT[, dateTime := as.POSIXct(paste(Date, Time), format = "%d/%m/%Y %H:%M:%S")]
-powerDT <- powerDT[(dateTime >= "2007-02-01") & (dateTime < "2007-02-03")]
-png("plot3.png", width=480, height=480)
+setwd("C:/Users/mccan/Documents/R/Repositorios/ProgrammingAssignment4.1")
+data <- data.table::fread(input = "household_power_consumption.txt"
+                          , na.strings="?")
 
-plot(powerDT[, dateTime], powerDT[, Sub_metering_1], type="l", xlab="", ylab="Energy sub metering")
-lines(powerDT[, dateTime], powerDT[, Sub_metering_2],col="red")
-lines(powerDT[, dateTime], powerDT[, Sub_metering_3],col="blue")
+dataframe <- as.data.frame(data)
+
+dataframe <- mutate(dataframe, dateTime = paste(Date, Time))
+dataframe$dateTime <-  as.POSIXct(dataframe$dateTime, format = "%d/%m/%Y %H:%M:%S")
+head(dataframe)
+
+
+dataframe <- filter(dataframe, dateTime >= "2007-02-01")
+dataframe <- filter(dataframe, dateTime <= "2007-02-02")
+str(dataframe)
+head(dataframe)
+
+
+
+plot(dataframe[, dateTime], dataframe[, Sub_metering_1], type="l", xlab="", ylab="Energy sub metering")
+lines(dataframe[, dateTime], dataframe[, Sub_metering_2],col="red")
+lines(dataframe[, dateTime], dataframe[, Sub_metering_3],col="blue")
 legend("topright"
        , col=c("black","red","blue")
        , c("Sub_metering_1  ","Sub_metering_2  ", "Sub_metering_3  ")
